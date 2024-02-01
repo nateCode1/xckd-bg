@@ -1,0 +1,8 @@
+{
+  "mode": "Random",
+  "run": "Run on Startup",
+  "color": "#FFFFFF",
+  "shadow": false,
+  "alt_text": true,
+  "title": true
+}
