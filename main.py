@@ -13,7 +13,7 @@ def add_tuples(tup1, tup2):
     return tuple([tup1[i] + tup2[i] for i in range(len(tup1))])
 
 
-def draw_text(text, size, ypos, fill_color, background):
+def draw_text(text, size, ypos, fill_color, background, align_right=False):
     # Create a drawing object
     draw = ImageDraw.Draw(background)
 
@@ -30,7 +30,7 @@ def draw_text(text, size, ypos, fill_color, background):
     text_size = draw.textbbox((0, 0), wrapped_text, font)
 
     # Calculate the position to center the text
-    x = (background.width - text_size[0]) // 2 - text_size[2] // 2
+    x = 10 if align_right else (background.width - text_size[0]) // 2 - text_size[2] // 2
     y = ypos  # (background.height - text_size[1]) // 2
 
     # Add text to the image
@@ -123,7 +123,12 @@ def composite_image(max_img_width_pct=0.9, max_img_height_pct=0.7):
         shadow = shadow.filter(ImageFilter.GaussianBlur(radius=blur_radius))
         background = Image.alpha_composite(background, shadow)
 
-    # Write text
+    # Write Attribution
+    draw_text("Randall Munroe - xkcd.com", 15, 5, color_from_hex(config["text_color"]), background, align_right=True)
+    # draw_text("xkcd.com", 15, 25, color_from_hex(config["text_color"]), background, align_right=True)
+
+
+    # Write image metadata
     if config["alt_text"] or config["title"]:
         # Load the JSON data from the file
         with open("image_meta.json", 'r') as file:

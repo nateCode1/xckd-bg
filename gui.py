@@ -11,6 +11,7 @@ def on_close():
     set_background()
     root.destroy()
 
+
 class XKCDBackgroundTool:
     def __init__(self, master):
         self.target_preview_size = (0,0)
