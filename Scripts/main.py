@@ -86,8 +86,6 @@ def composite_image(max_img_width_pct=0.9, max_img_height_pct=0.7):
 
     with open("../Data/config.json", 'r') as file:
         config = json.load(file)
-
-    # Open the original image
     original_image = Image.open(image_path)
 
     # Get monitor size
@@ -95,12 +93,10 @@ def composite_image(max_img_width_pct=0.9, max_img_height_pct=0.7):
 
     # Resize the image to fit the specified dimensions
     image_target_size = (target_size.width * max_img_width_pct, target_size.height * max_img_height_pct)
-
     image_scale_factor = min(image_target_size[0] / original_image.width, image_target_size[1] / original_image.height)
-
     resized_image = original_image.resize((round(original_image.width * image_scale_factor), round(original_image.height * image_scale_factor)), Image.LANCZOS)
 
-    # Create a blank white image with the specified resolution
+    # Create background image of full monitor size
     background = Image.new('RGBA', (target_size.width, target_size.height), color_from_hex(config["color"]))
 
     # Image offset on the background
@@ -116,7 +112,7 @@ def composite_image(max_img_width_pct=0.9, max_img_height_pct=0.7):
         shadow = Image.new('RGBA', background.size, (0, 0, 0, 0))
         draw = ImageDraw.Draw(shadow)
 
-        # Update the shadow offset to be in the right positon on the bg
+        # Update the shadow offset to be in the right position on the bg
         shadow_offset = add_tuples(shadow_offset, im_offset)
         draw.polygon([shadow_offset,
                       (resized_image.width + shadow_offset[0], shadow_offset[1]),
@@ -142,17 +138,15 @@ def composite_image(max_img_width_pct=0.9, max_img_height_pct=0.7):
         if config["alt_text"] and not image_meta["title"] == image_meta["alt_text"]:
             draw_text(image_meta["alt_text"], 20, 125, color_from_hex(config["text_color"]), background)
 
-    # Paste the resized image onto the white background
+    # Paste the resized image onto the background
     background.paste(resized_image, im_offset)
 
     # Save the combined image
     background.save("../Images/combined_wallpaper.png")
 
 def set_background():
-    # --- SET BG
     SPI_SETDESKWALLPAPER = 0x0014
 
-    # Set the system background
     ctypes.windll.user32.SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, os.path.abspath(
         "../Images/combined_wallpaper.png"), 3)
 

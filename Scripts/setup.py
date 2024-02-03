@@ -38,7 +38,7 @@ def setup_event():
     action.Path = 'cmd.exe'
     action.Arguments = '/c start /min "" ' + os.path.abspath('update.bat') + ' ^&exit'
 
-    # Create .bat file
+    # Create update.bat file
     with open('update.bat', 'w') as bat_file:
         bat_file.write("cd " + os.path.abspath('main.py')[:-7] + '\n' +
                        "Python main.py")
