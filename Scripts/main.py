@@ -1,5 +1,4 @@
 import textwrap
-
 import requests
 from bs4 import BeautifulSoup as bs
 import ctypes
@@ -7,7 +6,8 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 import os
 from screeninfo import get_monitors
 import json
-
+import schedule
+import time
 
 def add_tuples(tup1, tup2):
     return tuple([tup1[i] + tup2[i] for i in range(len(tup1))])
@@ -18,11 +18,11 @@ def draw_text(text, size, ypos, fill_color, background, align_right=False):
     draw = ImageDraw.Draw(background)
 
     # Load a font
-    font = ImageFont.truetype("Fonts/LucidaSansDemiBold.ttf", size)
+    font = ImageFont.truetype("../Fonts/LucidaSansDemiBold.ttf", size)
 
     # Determine the characters per line
-    letter_size = draw.textbbox((0, 0), 'a', font)
-    max_line_length = background.width // letter_size[1] - 5
+    letter_size = draw.textbbox((0, 0), 'A', font)
+    max_line_length = background.width // (letter_size[2] * 0.9)
 
     wrapped_text = textwrap.fill(text, width=max_line_length)
 
@@ -30,7 +30,7 @@ def draw_text(text, size, ypos, fill_color, background, align_right=False):
     text_size = draw.textbbox((0, 0), wrapped_text, font)
 
     # Calculate the position to center the text
-    x = 10 if align_right else (background.width - text_size[0]) // 2 - text_size[2] // 2
+    x = 8 if align_right else (background.width - text_size[0]) // 2 - text_size[2] // 2
     y = ypos  # (background.height - text_size[1]) // 2
 
     # Add text to the image
@@ -51,8 +51,12 @@ def color_from_hex(hex_string):
 
 
 def get_image():
-    image_path = "comic.png"
-    r = requests.get('https://c.xkcd.com/random/comic/')
+    with open("../Data/config.json", 'r') as file:
+        config = json.load(file)
+
+    image_path = "../Images/comic.png"
+    url = "https://xkcd.com/" if config['mode'] == 'Latest' else 'https://c.xkcd.com/random/comic/'
+    r = requests.get(url)
 
     soup = bs(r.content, features="lxml")
 
@@ -73,14 +77,14 @@ def get_image():
         'alt_text': alt_text
     }
 
-    with open("image_meta.json", 'w') as file:
+    with open("../Data/image_meta.json", 'w') as file:
         json.dump(image_data, file, indent=2)
 
 
 def composite_image(max_img_width_pct=0.9, max_img_height_pct=0.7):
-    image_path = "comic.png"
+    image_path = "../Images/comic.png"
 
-    with open("config.json", 'r') as file:
+    with open("../Data/config.json", 'r') as file:
         config = json.load(file)
 
     # Open the original image
@@ -124,37 +128,49 @@ def composite_image(max_img_width_pct=0.9, max_img_height_pct=0.7):
         background = Image.alpha_composite(background, shadow)
 
     # Write Attribution
-    draw_text("Randall Munroe - xkcd.com", 15, 5, color_from_hex(config["text_color"]), background, align_right=True)
-    # draw_text("xkcd.com", 15, 25, color_from_hex(config["text_color"]), background, align_right=True)
-
+    draw_text("Randall Munroe - xkcd.com", 20, 8, color_from_hex(config["text_color"]), background, align_right=True)
 
     # Write image metadata
     if config["alt_text"] or config["title"]:
         # Load the JSON data from the file
-        with open("image_meta.json", 'r') as file:
+        with open("../Data/image_meta.json", 'r') as file:
             image_meta = json.load(file)
 
         if config["title"]:
             draw_text(image_meta["title"], 80, 25, color_from_hex(config["text_color"]), background)
 
         if config["alt_text"] and not image_meta["title"] == image_meta["alt_text"]:
-            draw_text(image_meta["alt_text"], 20, 135, color_from_hex(config["text_color"]), background)
+            draw_text(image_meta["alt_text"], 20, 125, color_from_hex(config["text_color"]), background)
 
     # Paste the resized image onto the white background
     background.paste(resized_image, im_offset)
 
     # Save the combined image
-    background.save("combined_wallpaper.png")
+    background.save("../Images/combined_wallpaper.png")
 
 def set_background():
     # --- SET BG
     SPI_SETDESKWALLPAPER = 0x0014
 
     # Set the system background
-    ctypes.windll.user32.SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, os.path.abspath("combined_wallpaper.png"), 3)
+    ctypes.windll.user32.SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, os.path.abspath(
+        "../Images/combined_wallpaper.png"), 3)
+
+
+def update():
+    print("Starting...")
+    get_image()
+    print("Image retrieved")
+    composite_image()
+    print("Background generated")
+    set_background()
+    print("Done.")
 
 
 if __name__ == "__main__":
-    get_image()
-    composite_image()
-    set_background()
+    update()
+
+    # schedule.every(5).seconds.do(update)
+    # while True:
+    #     schedule.run_pending()
+    #     time.sleep(1)
