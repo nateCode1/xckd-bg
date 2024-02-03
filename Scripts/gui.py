@@ -20,6 +20,9 @@ class XKCDBackgroundTool:
         self.master = master
         self.master.title("XKCD Background Tool")
 
+        root.iconbitmap(default='../xkcd.ico')    # Window icon
+
+
         with open("../Data/config.json", 'r') as file:
             config = json.load(file)
 
@@ -38,8 +41,8 @@ class XKCDBackgroundTool:
         # Mode selection
         self.mode_label = ttk.Label(master, text="Select Mode:")
         self.mode_var = tk.StringVar(value=config["mode"] if "mode" in config else "Latest")
-        self.random_radio = ttk.Radiobutton(master, text="Random", variable=self.mode_var, value="Random")
         self.latest_radio = ttk.Radiobutton(master, text="Latest", variable=self.mode_var, value="Latest")
+        self.random_radio = ttk.Radiobutton(master, text="Random", variable=self.mode_var, value="Random")
 
         # Select when to run selection
         self.run_label = ttk.Label(master, text="Select Run Option:")
@@ -86,10 +89,13 @@ class XKCDBackgroundTool:
         self.image = tk.PhotoImage(file=self.image_path)
         self.preview_image = tk.Label(master, image=self.image, relief="solid", width=self.target_preview_size[0], height=self.target_preview_size[1])
 
+        # Text color selection
+        self.apply_button = ttk.Button(master, text="Apply and Close", command=on_close)
+
         # Create and place widgets on the grid
         self.mode_label.grid(row=0, column=0, padx=10, pady=5, sticky="w")
-        self.random_radio.grid(row=0, column=1, padx=10, pady=5, sticky="w")
-        self.latest_radio.grid(row=0, column=2, padx=10, pady=5, sticky="w")
+        self.latest_radio.grid(row=0, column=1, padx=10, pady=5, sticky="w")
+        self.random_radio.grid(row=0, column=2, padx=10, pady=5, sticky="w")
 
         self.run_label.grid(row=1, column=0, padx=10, pady=5, sticky="w")
         self.startup_radio.grid(row=1, column=1, padx=10, pady=5, sticky="w")
@@ -108,8 +114,10 @@ class XKCDBackgroundTool:
         self.alt_text_checkbox.grid(row=5, column=1, padx=10, pady=5, sticky="w")
         self.title_checkbox.grid(row=5, column=2, padx=10, pady=5, sticky="w")
 
-        self.preview_label.grid(row=6, column=0, columnspan=5, padx=10, pady=5, sticky="w")
-        self.preview_image.grid(row=7, column=0, columnspan=5, padx=10, pady=5)
+        self.preview_label.grid(row=6, column=0, columnspan=3, padx=10, pady=5, sticky="w")
+        self.preview_image.grid(row=7, column=0, columnspan=3, padx=10, pady=5)
+
+        self.apply_button.grid(row=8, column=0, columnspan=3, padx=10, pady=15)
 
         # Add update calls on change
         self.mode_var.trace_add("write", lambda *args : self.update(*args, trigger_rerender=False))

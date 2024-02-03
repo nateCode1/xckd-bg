@@ -40,8 +40,7 @@ def setup_event():
 
     # Create update.bat file
     with open('update.bat', 'w') as bat_file:
-        bat_file.write("cd " + os.path.abspath('main.py')[:-7] + '\n' +
-                       "Python main.py")
+        bat_file.write("cd " + os.path.abspath('main.py')[:-7] + '\n' + "Python main.py")
 
     # Set parameters
     task_def.RegistrationInfo.Description = 'Update the desktop background (from xkcd background manager).'
