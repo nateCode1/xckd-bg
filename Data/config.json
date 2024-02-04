@@ -1,1 +1,1 @@
-{"mode": "Latest", "run": "Run on Login", "run_interval": "3", "color": "#ffffff", "text_color": "#000000", "shadow": true, "alt_text": true, "title": true}
+{"mode": "Random", "run": "Run Every x Hours", "run_interval": "3", "color": "#ffffff", "text_color": "#000000", "shadow": true, "alt_text": true, "title": true}

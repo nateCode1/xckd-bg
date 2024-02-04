@@ -35,12 +35,24 @@ def setup_event():
     TASK_ACTION_EXEC = 0
     action = task_def.Actions.Create(TASK_ACTION_EXEC)
     action.ID = 'DO NOTHING'
-    action.Path = 'cmd.exe'
-    action.Arguments = '/c start /min "" ' + os.path.abspath('update.bat') + ' ^&exit'
+    action.Path = os.path.abspath('r_update.vbs') # 'cmd.exe'
+    # action.Arguments = "bash.exe -c 'echo it worked > " + os.path.abspath("update.bat")[:-10] + " '"
+    #"bash.exe -c 'cd " + os.path.abspath("update.bat")[:-10] + " && update.bat'"
+    # '/c start /min "" ' + os.path.abspath('update.bat') + ' ^&exit'
 
     # Create update.bat file
     with open('update.bat', 'w') as bat_file:
         bat_file.write("cd " + os.path.abspath('main.py')[:-7] + '\n' + "Python main.py")
+
+    # Create r_update.vbs file
+    with open('r_update.vbs', 'w') as vbs_file:
+        vbs_file.write(f"""
+        Dim WinScriptHost
+        Set WinScriptHost = CreateObject("WScript.Shell")
+        WinScriptHost.Run Chr(34) & "{os.path.abspath('update.bat')}" & Chr(34), 0
+        Set WinScriptHost = Nothing
+        """)
+
 
     # Set parameters
     task_def.RegistrationInfo.Description = 'Update the desktop background (from xkcd background manager).'

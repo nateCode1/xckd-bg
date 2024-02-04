@@ -20,7 +20,7 @@ class XKCDBackgroundTool:
         self.master = master
         self.master.title("XKCD Background Tool")
 
-        root.iconbitmap(default='../xkcd.ico')    # Window icon
+        root.iconbitmap(default='../Images/xkcd.ico')    # Window icon
 
 
         with open("../Data/config.json", 'r') as file:
