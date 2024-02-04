@@ -12,6 +12,7 @@
 <h2>Uninstallation</h2>
 <ol>
   <li>Run uninstall.bat</li>
+  <li>Delete files</li>
   <li>Change your desktop background</li>
 </ol>
 
