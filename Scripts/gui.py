@@ -4,14 +4,22 @@ from tkinter import *
 import json
 from screeninfo import get_monitors
 from PIL import Image, ImageTk
-from main import composite_image, set_background
+from bgmanager import update, composite_image, set_background
 from setup import setup_event
 
 
 def on_close():
-    setup_event()
-    set_background()
     root.destroy()
+    setup_event()
+    update()
+
+
+def create_gui():
+    global root
+    root = tk.Tk()
+    root.protocol("WM_DELETE_WINDOW", on_close)
+    app = XKCDBackgroundTool(root)
+    root.mainloop()
 
 
 class XKCDBackgroundTool:
@@ -202,7 +210,4 @@ class XKCDBackgroundTool:
 
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    root.protocol("WM_DELETE_WINDOW", on_close)
-    app = XKCDBackgroundTool(root)
-    root.mainloop()
+    create_gui()

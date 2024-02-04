@@ -15,7 +15,7 @@ def setup_event():
 
     # Create trigger
     if config["run"] == "Run Every x Hours":
-        start_time = datetime.datetime.now() + datetime.timedelta(seconds=10)
+        start_time = datetime.datetime.now() + datetime.timedelta(hours=int(config.get("run_interval", 4)))
         TASK_TRIGGER_TIME = 1
         trigger = task_def.Triggers.Create(TASK_TRIGGER_TIME)
         trigger.StartBoundary = start_time.isoformat()
@@ -42,7 +42,7 @@ def setup_event():
 
     # Create update.bat file
     with open('update.bat', 'w') as bat_file:
-        bat_file.write("cd " + os.path.abspath('main.py')[:-7] + '\n' + "Python main.py")
+        bat_file.write("cd " + os.path.abspath('bgmanager.py')[:-7] + '\n' + "Python bgmanager.py")
 
     # Create r_update.vbs file
     with open('r_update.vbs', 'w') as vbs_file:
