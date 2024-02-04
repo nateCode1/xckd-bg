@@ -6,8 +6,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 import os
 from screeninfo import get_monitors
 import json
-import schedule
-import time
+from util import get_path
 
 def add_tuples(tup1, tup2):
     return tuple([tup1[i] + tup2[i] for i in range(len(tup1))])
@@ -18,7 +17,7 @@ def draw_text(text, size, ypos, fill_color, background, align_right=False):
     draw = ImageDraw.Draw(background)
 
     # Load a font
-    font = ImageFont.truetype("../Fonts/LucidaSansDemiBold.ttf", size)
+    font = ImageFont.truetype(get_path("../Fonts/LucidaSansDemiBold.ttf"), size)
 
     # Determine the characters per line
     letter_size = draw.textbbox((0, 0), 'A', font)
@@ -51,10 +50,10 @@ def color_from_hex(hex_string):
 
 
 def get_image():
-    with open("../Data/config.json", 'r') as file:
+    with open(get_path("../Data/config.json"), 'r') as file:
         config = json.load(file)
 
-    image_path = "../Images/comic.png"
+    image_path = get_path("../Images/comic.png")
     url = "https://xkcd.com/" if config['mode'] == 'Latest' else 'https://c.xkcd.com/random/comic/'
     r = requests.get(url)
 
@@ -77,14 +76,14 @@ def get_image():
         'alt_text': alt_text
     }
 
-    with open("../Data/image_meta.json", 'w') as file:
+    with open(get_path("../Data/image_meta.json"), 'w') as file:
         json.dump(image_data, file, indent=2)
 
 
 def composite_image(max_img_width_pct=0.9, max_img_height_pct=0.7):
-    image_path = "../Images/comic.png"
+    image_path = get_path("../Images/comic.png")
 
-    with open("../Data/config.json", 'r') as file:
+    with open(get_path("../Data/config.json"), 'r') as file:
         config = json.load(file)
     original_image = Image.open(image_path)
 
@@ -129,7 +128,7 @@ def composite_image(max_img_width_pct=0.9, max_img_height_pct=0.7):
     # Write image metadata
     if config["alt_text"] or config["title"]:
         # Load the JSON data from the file
-        with open("../Data/image_meta.json", 'r') as file:
+        with open(get_path("../Data/image_meta.json"), 'r') as file:
             image_meta = json.load(file)
 
         if config["title"]:
@@ -142,13 +141,13 @@ def composite_image(max_img_width_pct=0.9, max_img_height_pct=0.7):
     background.paste(resized_image, im_offset)
 
     # Save the combined image
-    background.save("../Images/combined_wallpaper.png")
+    background.save(get_path("../Images/combined_wallpaper.png"))
 
 def set_background():
     SPI_SETDESKWALLPAPER = 0x0014
 
     ctypes.windll.user32.SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, os.path.abspath(
-        "../Images/combined_wallpaper.png"), 3)
+        get_path("../Images/combined_wallpaper.png")), 3)
 
 
 def update():
@@ -163,8 +162,3 @@ def update():
 
 if __name__ == "__main__":
     update()
-
-    # schedule.every(5).seconds.do(update)
-    # while True:
-    #     schedule.run_pending()
-    #     time.sleep(1)

@@ -2,10 +2,11 @@ import datetime
 import win32com.client
 import os
 import json
+from util import get_path
 
 
 def setup_event():
-    with open("../Data/config.json", 'r') as file:
+    with open(get_path("../Data/config.json"), 'r') as file:
         config = json.load(file)
 
     scheduler = win32com.client.Dispatch('Schedule.Service')
@@ -35,21 +36,21 @@ def setup_event():
     TASK_ACTION_EXEC = 0
     action = task_def.Actions.Create(TASK_ACTION_EXEC)
     action.ID = 'DO NOTHING'
-    action.Path = os.path.abspath('r_update.vbs') # 'cmd.exe'
+    action.Path = os.path.abspath('./r_update.vbs') # 'cmd.exe'
     # action.Arguments = "bash.exe -c 'echo it worked > " + os.path.abspath("update.bat")[:-10] + " '"
     #"bash.exe -c 'cd " + os.path.abspath("update.bat")[:-10] + " && update.bat'"
     # '/c start /min "" ' + os.path.abspath('update.bat') + ' ^&exit'
 
     # Create update.bat file
-    with open('update.bat', 'w') as bat_file:
+    with open(get_path('./update.bat'), 'w') as bat_file:
         bat_file.write("cd " + os.path.abspath('bgmanager.py')[:-7] + '\n' + "Python bgmanager.py")
 
     # Create r_update.vbs file
-    with open('r_update.vbs', 'w') as vbs_file:
+    with open(get_path('./r_update.vbs'), 'w') as vbs_file:
         vbs_file.write(f"""
         Dim WinScriptHost
         Set WinScriptHost = CreateObject("WScript.Shell")
-        WinScriptHost.Run Chr(34) & "{os.path.abspath('update.bat')}" & Chr(34), 0
+        WinScriptHost.Run Chr(34) & "{os.path.abspath('Scripts/update.bat')}" & Chr(34), 0
         Set WinScriptHost = Nothing
         """)
 

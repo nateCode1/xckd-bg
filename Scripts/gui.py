@@ -6,6 +6,7 @@ from screeninfo import get_monitors
 from PIL import Image, ImageTk
 from bgmanager import update, composite_image, set_background
 from setup import setup_event
+from util import get_path
 
 
 def on_close():
@@ -28,10 +29,9 @@ class XKCDBackgroundTool:
         self.master = master
         self.master.title("XKCD Background Tool")
 
-        root.iconbitmap(default='../Images/xkcd.ico')    # Window icon
+        root.iconbitmap(default=get_path('../Images/xkcd.ico'))  # Window icon
 
-
-        with open("../Data/config.json", 'r') as file:
+        with open(get_path("../Data/config.json"), 'r') as file:
             config = json.load(file)
 
         # Set styles
@@ -93,7 +93,7 @@ class XKCDBackgroundTool:
 
         # Preview section
         self.preview_label = tk.Label(master, text="Preview:", font=large_font)
-        self.image_path = "../Images/preview.png"  # Replace with the actual path to your image
+        self.image_path = get_path("../Images/preview.png")  # Replace with the actual path to your image
         self.image = tk.PhotoImage(file=self.image_path)
         self.preview_image = tk.Label(master, image=self.image, relief="solid", width=self.target_preview_size[0], height=self.target_preview_size[1])
 
@@ -171,9 +171,9 @@ class XKCDBackgroundTool:
         pw = 500
         self.target_preview_size = (pw, round(pw * res))
 
-        original_image = Image.open("../Images/combined_wallpaper.png")
+        original_image = Image.open(get_path("../Images/combined_wallpaper.png"))
         resized_image = original_image.resize(self.target_preview_size, Image.LANCZOS)
-        resized_image.save("../Images/preview.png")
+        resized_image.save(get_path("../Images/preview.png"))
 
     def set_hour_input(self):
         # Set if the hours input is enabled
@@ -198,13 +198,13 @@ class XKCDBackgroundTool:
         self.set_hour_input()
 
         # Save results
-        with open("../Data/config.json", "w") as json_file:
+        with open(get_path("../Data/config.json"), "w") as json_file:
             json.dump(config_data, json_file)
 
         # Re-render the image
         if trigger_rerender:
             self.update_image()
-            new_image = tk.PhotoImage(file="../Images/preview.png")
+            new_image = tk.PhotoImage(file=get_path("../Images/preview.png"))
             self.preview_image.configure(image=new_image)
             self.preview_image.image = new_image
 
