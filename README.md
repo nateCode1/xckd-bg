@@ -19,3 +19,7 @@
 <h2>Attribution</h2>
 <p>Check out the comics at <a href='https://xkcd.com/'>xkcd.com</a>.</p>
 <p>These comics are created by Randall Munroe.</p>
+
+<h2>Images</h2>
+![ketchup](https://github.com/nateCode1/xckd-bg/assets/52888031/12625361-54d9-4dfe-8b8a-4a4f4dc48790)
+![gui](https://github.com/nateCode1/xckd-bg/assets/52888031/931a35bc-d960-4187-b04d-50f0284181a1)
