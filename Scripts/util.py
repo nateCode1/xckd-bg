@@ -9,3 +9,6 @@ def get_path(filename):
         return os.path.join(sys._MEIPASS, filename)
     else:
         return filename
+
+def is_compiled():
+    return hasattr(sys, "_MEIPASS")

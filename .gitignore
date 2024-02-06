@@ -1,3 +1,10 @@
 
 Scripts/update.bat
 Scripts/r_update.vbs
+Data/config.json
+Data/image_meta.json
+Images/combined_wallpaper.png
+Images/comic.png
+Images/preview.png
+Data/config.json
+build_config.json

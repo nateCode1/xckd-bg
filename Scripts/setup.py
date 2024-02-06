@@ -2,7 +2,7 @@ import datetime
 import win32com.client
 import os
 import json
-from util import get_path
+from util import get_path, is_compiled
 
 
 def setup_event():
@@ -36,21 +36,23 @@ def setup_event():
     TASK_ACTION_EXEC = 0
     action = task_def.Actions.Create(TASK_ACTION_EXEC)
     action.ID = 'DO NOTHING'
-    action.Path = os.path.abspath('./r_update.vbs') # 'cmd.exe'
-    # action.Arguments = "bash.exe -c 'echo it worked > " + os.path.abspath("update.bat")[:-10] + " '"
+    apath = os.path.abspath('./r_update.vbs')
+    if is_compiled():
+        apath = os.path.abspath('./_internal/Scripts/r_update.vbs')
+    action.Path = apath
     #"bash.exe -c 'cd " + os.path.abspath("update.bat")[:-10] + " && update.bat'"
     # '/c start /min "" ' + os.path.abspath('update.bat') + ' ^&exit'
 
     # Create update.bat file
     with open(get_path('./update.bat'), 'w') as bat_file:
-        bat_file.write("cd " + os.path.abspath('bgmanager.py')[:-7] + '\n' + "Python bgmanager.py")
+        bat_file.write("cd " + os.path.abspath('bgmanager.py')[:-12] + '\n' + "Python bgmanager.py")
 
     # Create r_update.vbs file
     with open(get_path('./r_update.vbs'), 'w') as vbs_file:
         vbs_file.write(f"""
         Dim WinScriptHost
         Set WinScriptHost = CreateObject("WScript.Shell")
-        WinScriptHost.Run Chr(34) & "{os.path.abspath('Scripts/update.bat')}" & Chr(34), 0
+        WinScriptHost.Run Chr(34) & "{os.path.abspath('update.bat')}" & Chr(34), 0
         Set WinScriptHost = Nothing
         """)
 

@@ -80,27 +80,26 @@ def get_image():
         json.dump(image_data, file, indent=2)
 
 
-def composite_image(max_img_width_pct=0.9, max_img_height_pct=0.7):
+def composite_image(max_img_width_pct=0.9, max_img_height_pct=0.65):
     image_path = get_path("../Images/comic.png")
 
     with open(get_path("../Data/config.json"), 'r') as file:
         config = json.load(file)
     original_image = Image.open(image_path)
 
-    # Get monitor size
-    target_size = get_monitors()[0]  # gets primary display
+    target_size = (4096, 2160)
 
     # Resize the image to fit the specified dimensions
-    image_target_size = (target_size.width * max_img_width_pct, target_size.height * max_img_height_pct)
+    image_target_size = (target_size[0] * max_img_width_pct, target_size[1] * max_img_height_pct)
     image_scale_factor = min(image_target_size[0] / original_image.width, image_target_size[1] / original_image.height)
     resized_image = original_image.resize((round(original_image.width * image_scale_factor), round(original_image.height * image_scale_factor)), Image.LANCZOS)
 
     # Create background image of full monitor size
-    background = Image.new('RGBA', (target_size.width, target_size.height), color_from_hex(config["color"]))
+    background = Image.new('RGBA', (target_size[0], target_size[1]), color_from_hex(config["color"]))
 
     # Image offset on the background
-    im_offset = ((target_size.width - resized_image.width) // 2,
-                 (target_size.height - resized_image.height) // 2 + 50)
+    im_offset = ((target_size[0] - resized_image.width) // 2,
+                 (target_size[1] - resized_image.height) // 2 + 50)
 
     # Do shadow
     if config['shadow']:
@@ -123,7 +122,7 @@ def composite_image(max_img_width_pct=0.9, max_img_height_pct=0.7):
         background = Image.alpha_composite(background, shadow)
 
     # Write Attribution
-    draw_text("Randall Munroe - xkcd.com", 20, 8, color_from_hex(config["text_color"]), background, align_right=True)
+    draw_text("Randall Munroe - xkcd.com", 35, 8, color_from_hex(config["text_color"]), background, align_right=True)
 
     # Write image metadata
     if config["alt_text"] or config["title"]:
@@ -132,13 +131,17 @@ def composite_image(max_img_width_pct=0.9, max_img_height_pct=0.7):
             image_meta = json.load(file)
 
         if config["title"]:
-            draw_text(image_meta["title"], 80, 25, color_from_hex(config["text_color"]), background)
+            draw_text(image_meta["title"], 180, 25, color_from_hex(config["text_color"]), background)
 
         if config["alt_text"] and not image_meta["title"] == image_meta["alt_text"]:
-            draw_text(image_meta["alt_text"], 20, 125, color_from_hex(config["text_color"]), background)
+            draw_text(image_meta["alt_text"], 55, 225, color_from_hex(config["text_color"]), background)
 
     # Paste the resized image onto the background
     background.paste(resized_image, im_offset)
+
+    # Scale to fit monitor
+    monitor_size = get_monitors()[0]
+    background = background.resize((monitor_size.width, monitor_size.height), Image.LANCZOS)
 
     # Save the combined image
     background.save(get_path("../Images/combined_wallpaper.png"))
