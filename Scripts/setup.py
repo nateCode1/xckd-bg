@@ -45,7 +45,13 @@ def setup_event():
 
     # Create update.bat file
     with open(get_path('./update.bat'), 'w') as bat_file:
-        bat_file.write("cd " + os.path.abspath('bgmanager.py')[:-12] + '\n' + "Python bgmanager.py")
+        bat_file.write(f"""
+        cd {os.path.abspath('bgmanager.py')[:-12]}
+        cd ..
+        call .venv\\Scripts\\activate
+        cd {os.path.abspath('bgmanager.py')[:-12]}
+        Python bgmanager.py
+        """)
 
     # Create r_update.vbs file
     with open(get_path('./r_update.vbs'), 'w') as vbs_file:
